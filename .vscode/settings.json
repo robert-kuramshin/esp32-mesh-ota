@@ -19,6 +19,7 @@
         "*.ipp": "c",
         "cmath": "c",
         "complex": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "esp_mesh_internal.h": "c"
 }
 }
