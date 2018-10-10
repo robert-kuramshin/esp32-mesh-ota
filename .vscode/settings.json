@@ -1,0 +1,24 @@
+{
+"files.associations": {
+        "wifi.h": "c",
+        "stdio.h": "c",
+        "esp_log.h": "c",
+        "freertos.h": "c",
+        "cerrno": "c",
+        "typeinfo": "c",
+        "ota_connection.h": "c",
+        "chrono": "c",
+        "limits": "c",
+        "array": "c",
+        "string_view": "c",
+        "functional": "c",
+        "ratio": "c",
+        "type_traits": "c",
+        "tuple": "c",
+        "utility": "c",
+        "*.ipp": "c",
+        "cmath": "c",
+        "complex": "c",
+        "cstdlib": "c"
+}
+}
