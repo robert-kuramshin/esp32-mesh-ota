@@ -4,17 +4,16 @@
 #define MESH_MAX_LAYER 10
 #define MESH_VOTE_PERCENTAGE 0.9
 #define MESH_ASSOC_EXP 10
-#define MESH_CHANNEL
+#define MESH_CHANNEL    1
 
 //---------------------------------------------------------------------------
 // ROUTER
 //---------------------------------------------------------------------------
-#define MESH_ROUTER_SSID
-#define MESH_ROUTER_PASSWD
+#define MESH_ROUTER_SSID    "University House Midtown"
+#define MESH_ROUTER_PASSWD  "UniHouseATL"
 
 //---------------------------------------------------------------------------
 // AP
 //---------------------------------------------------------------------------
-#define MESH_AP_AUTHMODE
-#define MESH_AP_CONNECTIONS
-#define MESH_AP_PASSWD
+#define MESH_AP_CONNECTIONS 10
+#define MESH_AP_PASSWD  "MAP_PASSWD"
