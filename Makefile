@@ -5,5 +5,5 @@
 
 PROJECT_NAME := esp32-mesh-ota
 
-include $(MDF_PATH)/project.mk
+include $(IDF_PATH)/make/project.mk
 
