@@ -8,11 +8,11 @@
 #include "nvs_flash.h"
 #include "config.h"
 
-
-
 #define RX_SIZE          (1500)
 #define TX_SIZE          (1460)
 
+
+static const uint32_t version = 0;
 
 static const char *TAG = "main";
 static const uint8_t MESH_ID[6] = { 0x77, 0x77, 0x77, 0x77, 0x77, 0x77};
@@ -23,6 +23,8 @@ static bool is_mesh_connected = false;
 static mesh_addr_t mesh_parent_addr;
 static int mesh_layer = -1;
 
+
+//transmit version to root
 void esp_mesh_p2p_tx_main(void *arg)
 {
     int i;
@@ -38,15 +40,28 @@ void esp_mesh_p2p_tx_main(void *arg)
 
     is_running = true;
     while (is_running) {
-        /* non-root do nothing but print */
+        // NON ROOT
         if (!esp_mesh_is_root()) {
             ESP_LOGI(TAG, "layer:%d, rtableSize:%d, %s", mesh_layer,
                      esp_mesh_get_routing_table_size(),
                      (is_mesh_connected && esp_mesh_is_root()) ? "ROOT" : is_mesh_connected ? "NODE" : "DISCONNECT");
+
+            memcpy(tx_buf,version,sizeof(uint32_t));//PUT version in message
+
+            err = esp_mesh_send(NULL, &data, 0, NULL, 0); //SEND MESSAGE TO ROOT
+            if (err) {
+                ESP_LOGE(TAG,"NON ROOT SEND ERROR");
+            } else if (!(send_count % 100)) {
+                ESP_LOGW(TAG,"NON ROOT SEND WARNING");
+            }
             vTaskDelay(10 * 1000 / portTICK_RATE_MS);
             continue;
         }
+        // ROOT
+        
 
+        /* nothing for now
+        // ROOT
         esp_mesh_get_routing_table((mesh_addr_t *) &route_table,
                                    MESH_ROUTE_TABLE_SIZE * 6, &route_table_size);
         if (send_count && !(send_count % 100)) {
@@ -58,12 +73,6 @@ void esp_mesh_p2p_tx_main(void *arg)
         tx_buf[24] = (send_count >> 16) & 0xff;
         tx_buf[23] = (send_count >> 8) & 0xff;
         tx_buf[22] = (send_count >> 0) & 0xff;
-        /*
-        if (send_count % 2) {
-            memcpy(tx_buf, (uint8_t *)&light_on, sizeof(light_on));
-        } else {
-            memcpy(tx_buf, (uint8_t *)&light_off, sizeof(light_off));
-        }*/
 
         for (i = 0; i < route_table_size; i++) {
             err = esp_mesh_send(&route_table[i], &data, MESH_DATA_P2P, NULL, 0);
@@ -83,14 +92,15 @@ void esp_mesh_p2p_tx_main(void *arg)
                          err, data.proto, data.tos);
             }
         }
-        /* if route_table_size is less than 10, add delay to avoid watchdog in this task. */
         if (route_table_size < 10) {
             vTaskDelay(1 * 1000 / portTICK_RATE_MS);
-        }
+        }*/
     }
     vTaskDelete(NULL);
 }
 
+//recieve ota if root chooses to send you stuff
+//recieve versions if you are root and coordinate ota
 void esp_mesh_p2p_rx_main(void *arg)
 {
     int recv_count = 0;
@@ -110,7 +120,15 @@ void esp_mesh_p2p_rx_main(void *arg)
             ESP_LOGE(TAG, "err:0x%x, size:%d", err, data.size);
             continue;
         }
-        /* extract send count */
+        //NON ROOT
+        if (!esp_mesh_is_root()) {
+            vTaskDelay(10 * 1000 / portTICK_RATE_MS);
+            continue;
+        }
+        //ROOT
+        uint32_t version = *((uint32_t *)rx_buf);
+        ESP_LOGI(TAG,"Recieved version: %d from: "MACSTR" ",version,MAC2STR(from.addr));
+        /* 
         if (data.size >= sizeof(send_count)) {
             send_count = (data.data[25] << 24) | (data.data[24] << 16)
                          | (data.data[23] << 8) | data.data[22];
@@ -124,6 +142,8 @@ void esp_mesh_p2p_rx_main(void *arg)
                      data.size, esp_get_free_heap_size(), flag, err, data.proto,
                      data.tos);
         }
+        */
+    
     }
     vTaskDelete(NULL);
 }
